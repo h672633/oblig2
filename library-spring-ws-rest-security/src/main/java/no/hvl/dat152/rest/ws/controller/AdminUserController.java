@@ -4,6 +4,7 @@
 package no.hvl.dat152.rest.ws.controller;
 
 
+import no.hvl.dat152.rest.ws.model.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,23 +31,23 @@ public class AdminUserController {
 	private AdminUserService userService;
 	
 	@PutMapping("/users/{id}")
-	// TODO authority annotation
+	@PreAuthorize("hasAuthority('SUPER_ADMIN')")
 	public ResponseEntity<Object> updateUserRole(@PathVariable("id") Long id, @RequestParam("role") String role) 
 			throws UserNotFoundException{
-		
-		// TODO
-		
-		return null;
+
+		User user = userService.updateUserRole(id, role);
+		return new ResponseEntity<>(user, HttpStatus.OK);
+
 	}
 	
 	@DeleteMapping("/users/{id}")
-	// TODO authority annotation
+	@PreAuthorize("hasAuthority('SUPER_ADMIN')")
 	public ResponseEntity<Object> deleteUserRole(@PathVariable("id") Long id, 
 			@RequestParam("role") String role) throws UserNotFoundException{
-		
-		// TODO
-		
-		return null;
+
+		User user = userService.deleteUserRole(id, role);
+
+		return new ResponseEntity<>(user, HttpStatus.OK);
 	}
 	
 }

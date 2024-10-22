@@ -20,5 +20,45 @@ import no.hvl.dat152.rest.ws.repository.AuthorRepository;
 @Service
 public class AuthorService {
 
-	// TODO copy your solutions from previous tasks!
+    @Autowired
+    private AuthorRepository authorRepository;
+
+
+    public Author findById(long id) throws AuthorNotFoundException {
+
+        Author author = authorRepository.findById(id)
+                .orElseThrow(()-> new AuthorNotFoundException("Author with the id: "+id+ "not found!"));
+
+        return author;
+    }
+
+    public Author saveAuthor(Author author) {
+        return authorRepository.save(author);
+    }
+
+
+    public Author updateAuthor(Author author, long id) {
+        Author existingAuthor = authorRepository.findById(id).orElse(null);
+
+        existingAuthor.setFirstname(author.getFirstname());
+        existingAuthor.setLastname(author.getLastname());
+
+        return authorRepository.save(existingAuthor);
+
+    }
+
+    public List<Author> findAll() {
+        return (List<Author>) authorRepository.findAll();
+    }
+
+    public void deleteById(Long id) throws AuthorNotFoundException{
+        Author author = authorRepository.findById(id)
+                .orElseThrow(() -> new AuthorNotFoundException("Author with the id "+id+" not found"));
+        authorRepository.delete(author);
+    }
+
+    public Set<Book> findBooksByAuthorId(Long id) {
+        Author author = authorRepository.findById(id).orElse(null);
+        return author.getBooks();
+    }
 }

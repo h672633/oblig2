@@ -30,6 +30,55 @@ import no.hvl.dat152.rest.ws.service.AuthorService;
 @RequestMapping("/elibrary/api/v1")
 public class AuthorController {
 
-	// TODO authority annotation
+    @Autowired
+    private AuthorService authorservice;
+
+    @GetMapping("/authors")
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<Object> getAllAuthors() {
+        List<Author> authors = authorservice.findAll();
+
+        if (authors.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(authors, HttpStatus.OK);
+
+    }
+
+    @GetMapping("/authors/{id}")
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<Object> getAuthor(@PathVariable("id") Long id) throws AuthorNotFoundException {
+        Author author = authorservice.findById(id);
+        if (author == null) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(author, HttpStatus.OK);
+
+    }
+
+    @GetMapping("/authors/{id}/books")
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<Object> getBooksByAuthorId(@PathVariable("id") Long id) throws AuthorNotFoundException {
+        Set<Book> books = authorservice.findBooksByAuthorId(id);
+        if (books.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(books, HttpStatus.OK);
+    }
+
+    @PostMapping("/authors")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
+    public ResponseEntity<Object> createAuthor(@RequestBody Author author) {
+        Author newAuthor = authorservice.saveAuthor(author);
+        return new ResponseEntity<>(newAuthor, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/authors/{id}")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
+    public ResponseEntity<Object> updateAuthor(@RequestBody Author author, @PathVariable("id") Long id) {
+        Author newAuthor = authorservice.updateAuthor(author, id);
+        return new ResponseEntity<>(newAuthor, HttpStatus.OK);
+    }
+
 
 }

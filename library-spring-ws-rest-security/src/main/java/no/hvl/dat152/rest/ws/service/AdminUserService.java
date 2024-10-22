@@ -31,10 +31,29 @@ public class AdminUserService {
 		
 		return user;
 	}
-	
-	// TODO public User deleteUserRole(Long id, String role)
-	
-	// TODO public User updateUserRole(Long id, String role)
+
+	public User deleteUserRole(Long id, String role) {
+
+		User user = findUser(id);
+
+		Role role1 = roleRepository.findByName(role);
+
+		user.removeRole(role1);
+
+		return userRepository.save(user);
+	}
+
+	public User updateUserRole(Long id, String role)  {
+
+		User user = findUser(id);
+
+		Role role1 = roleRepository.findByName(role);
+
+		user.addRole(role1);
+
+		return userRepository.save(user);
+
+	}
 	
 	public User findUser(Long id) throws UserNotFoundException {
 		

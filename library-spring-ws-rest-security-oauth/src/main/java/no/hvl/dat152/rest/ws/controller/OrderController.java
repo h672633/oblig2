@@ -39,6 +39,42 @@ import no.hvl.dat152.rest.ws.service.OrderService;
 @RequestMapping("/elibrary/api/v1")
 public class OrderController {
 
-	// TODO authority annotation
-	
+    @Autowired
+    OrderService orderService;
+
+    @GetMapping("/orders")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Object> getAllBorrowOrders
+            (@RequestParam(value = "expiry", defaultValue = "9999-12-31") LocalDate expiry,
+             @RequestParam(value = "page", defaultValue = "0") int page,
+             @RequestParam(value = "size", defaultValue = "5") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<Order> orders = orderService.findByExpiryDate(expiry, pageable);
+        return new ResponseEntity<>(orders, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/orders/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Order> getBorrowOrder(@PathVariable("id") Long id) throws OrderNotFoundException, UnauthorizedOrderActionException {
+
+        return new ResponseEntity<>(orderService.findOrder(id), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/orders/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Order> updateOrder(@PathVariable("id") Long id, @RequestBody Order order) {
+
+        return new ResponseEntity<>(orderService.updateOrder(order, id), HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "/orders/{id}")
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<?> deleteBookOrder(@PathVariable("id") Long id) throws OrderNotFoundException {
+
+        orderService.deleteOrder(id);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
